@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const { Worker } = require('worker_threads');
 const app = express();
 const sequelize = require('./config/database');
 const User = require('./models/user');
@@ -27,36 +26,44 @@ app.get('/users', async (req, res) => {
 });
 
 //route to update the users balance
-app.put('/users',  async (req, res) => {
-  const {userId, amount} = req.params.userId;
+app.put('/users/:id/balance', async (req, res) => {
+  const { id } = req.params;
+  const { amount } = req.body;
 
-  const worker = new Worker('./workers/balanceWorker.js', {
-    workerData: { userId, amount }
-  });
+  try {
+    const result = await sequelize.transaction(async (t) => {
+      const user = await User.findByPk(id, { transaction: t });
 
-  worker.on('message', (message) => {
-    if (message.success) {
-      res.status(200).json({ message: 'Balance updated successfully', balance: message.balance });
-    } else {
-      if (message.error === 'Balance cannot go negative') {
-        res.status(400).json({ error: 'Not enough funds in the balance' });
-      } else {
-        res.status(500).json({ error: 'Internal server error' });
+      if (!user) {
+        throw new Error('User not found');
       }
-    }
-  });
 
-  worker.on('error', (error) => {
-    console.error('Worker error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  });
+      const newBalance = user.balance + amount;
 
-  worker.on('exit', (code) => {
-    if (code !== 0) {
-      console.error(`Worker stopped with exit code ${code}`);
+      if (newBalance < 0) {
+        throw new Error('Balance cannot go negative');
+      }
+
+      await user.update({ balance: newBalance }, { transaction: t });
+
+      return user;
+    });
+
+    res.status(200).json({ message: 'Balance updated successfully', balance: result.balance });
+  } catch (error) {
+    console.error('Error updating balance:', error.message);
+
+    if (error.message === 'User not found') {
+      res.status(404).json({ error: 'User not found' });
+    } else if (error.message === 'Balance cannot go negative') {
+      res.status(400).json({ error: 'Not enough funds in the balance' });
+    } else {
+      res.status(500).json({ error: 'Internal server error' });
     }
-  });
+  }
 });
+
+
 
 app.get('/reset', async (req, res) => {
   const userId = 1;
