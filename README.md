@@ -1,7 +1,7 @@
 <p align="center">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" width="100" style="margin-right: 20px;">
-    <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" width="100" style="margin-right: 20px;">
-    <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="100">
+  <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="100">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" width="100" style="margin-right: 50px;">
+  <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" width="100" style="margin-right: 50px;">
 </p>
 
 # Overview
