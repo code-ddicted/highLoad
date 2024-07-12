@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const { Worker } = require('worker_threads');
 const app = express();
 const sequelize = require('./config/database');
 const User = require('./models/user');
@@ -29,38 +30,32 @@ app.get('/users', async (req, res) => {
 app.put('/users/:userId/balance',  async (req, res) => {
   const userId = req.params.userId;
   const { amount } = req.body;
+  const worker = new Worker('./workers/balanceWorker.js', {
+    workerData: { userId, amount }
+  });
 
-  try {
-    // Use a transaction to ensure atomicity
-    const result = await sequelize.transaction(async (t) => {
-      const user = await User.findByPk(userId, { transaction: t });
-
-      if (!user) {
-        console.error(`User with ID ${userId} not found`);
-        throw new Error('User not found');
+  worker.on('message', (message) => {
+    if (message.success) {
+      res.status(200).json({ message: 'Balance updated successfully', balance: message.balance });
+    } else {
+      if (message.error === 'Balance cannot go negative') {
+        res.status(400).json({ error: 'Not enough funds in the balance' });
+      } else {
+        res.status(500).json({ error: 'Internal server error' });
       }
-
-      // Calculate new balance
-      const newBalance = user.balance + amount;
-
-      // Check if new balance would go negative
-      if (newBalance < 0) {
-        throw new Error('Balance cannot go negative');
-      }
-
-      // Update user's balance
-      await user.update({ balance: newBalance },{where: {id:userId}}, { transaction: t });
-
-      return user;
-    });
-
-    return res.status(200).json({ message: 'Balance updated successfully', balance: result.balance });
-  } catch (error) {
-    if (error.message === 'Balance cannot go negative') {
-      return res.status(400).json({ error: 'Not enough funds in the balance' });
     }
-    return res.status(500).json({ error: 'Internal server error' });
-  }
+  });
+
+  worker.on('error', (error) => {
+    console.error('Worker error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  });
+
+  worker.on('exit', (code) => {
+    if (code !== 0) {
+      console.error(`Worker stopped with exit code ${code}`);
+    }
+  });
 });
 
 app.get('/reset', async (req, res) => {

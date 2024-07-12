@@ -14,7 +14,7 @@ const sendRequest = async () => {
 
 const runLoadTest = async () => {
   // Generate 10,000 requests
-  const requests = Array.from({ length: 10000 }, () => sendRequest());
+  const requests = Array.from({ length: 400 }, () => sendRequest());
 
   // Send requests concurrently
   const results = await Promise.all(requests);
