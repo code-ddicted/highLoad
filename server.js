@@ -27,9 +27,9 @@ app.get('/users', async (req, res) => {
 });
 
 //route to update the users balance
-app.put('/users/:userId/balance',  async (req, res) => {
-  const userId = req.params.userId;
-  const { amount } = req.body;
+app.put('/users',  async (req, res) => {
+  const {userId, amount} = req.params.userId;
+
   const worker = new Worker('./workers/balanceWorker.js', {
     workerData: { userId, amount }
   });
