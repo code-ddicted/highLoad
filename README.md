@@ -1,6 +1,6 @@
 <div style="display: inline-block;">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" width="100"/>
-    <img src="https://sequelize.org/master/manual/asset/logo-small.png" alt="Sequelize" width="100"/>
+    <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" width="100"/>
     <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="100"/>
 </div>
 
