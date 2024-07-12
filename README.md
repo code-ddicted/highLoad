@@ -1,7 +1,7 @@
-<div style="display: inline-block;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" width="100"/>
-    <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" width="100"/>
-    <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="100"/>
+<div style="display: flex; justify-content: space-around;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" style="width: 100px; margin: 0 10px;"/>
+    <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" style="width: 100px; margin: 0 10px;"/>
+    <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" style="width: 100px; margin: 0 10px;"/>
 </div>
 
 # Overview
