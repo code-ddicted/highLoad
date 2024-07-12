@@ -4,6 +4,8 @@ const app = express();
 const sequelize = require('./config/database');
 const User = require('./models/user');
 
+var balCount=1;
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
@@ -42,6 +44,7 @@ app.put('/users/:id/balance', async (req, res) => {
 
       if (newBalance < 0) {
         throw new Error('Balance cannot go negative');
+        console.log('balance cannot go negative: '+ balCount++)
       }
 
       await user.update({ balance: newBalance }, { transaction: t });
@@ -51,12 +54,11 @@ app.put('/users/:id/balance', async (req, res) => {
 
     res.status(200).json({ message: 'Balance updated successfully', balance: result.balance });
   } catch (error) {
-    console.error('Error updating balance:', error.message);
 
     if (error.message === 'User not found') {
       res.status(404).json({ error: 'User not found' });
     } else if (error.message === 'Balance cannot go negative') {
-      res.status(400).json({ error: 'Not enough funds in the balance' });
+      res.status(400).json({ error: 'Balance cannot go negative' });
     } else {
       res.status(500).json({ error: 'Internal server error' });
     }
