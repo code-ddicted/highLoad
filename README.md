@@ -1,11 +1,8 @@
-### JavaScript
-![JavaScript](https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png)
-
-### Sequelize
-![Sequelize](https://sequelize.org/master/manual/asset/logo-small.png)
-
-### Node.js
-![Node.js](https://nodejs.org/static/images/logo.svg)
+<div style="display: inline-block;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" width="100"/>
+    <img src="https://sequelize.org/master/manual/asset/logo-small.png" alt="Sequelize" width="100"/>
+    <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="100"/>
+</div>
 
 # Overview
 This project is a Node.js application that connects to a PostgreSQL database using Sequelize ORM. It provides APIs for user management, including fetching user details, updating user balance, and resetting user balance. The application is designed for high performance and reliability, employing transactions and error handling to ensure data integrity.
