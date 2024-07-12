@@ -4,8 +4,6 @@ const app = express();
 const sequelize = require('./config/database');
 const User = require('./models/user');
 
-var balCount=1;
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
