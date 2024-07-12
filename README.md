@@ -1,6 +1,4 @@
-# Project Name
-
-## Overview
+# Overview
 This project is a Node.js application that connects to a PostgreSQL database using Sequelize ORM. It provides APIs for user management, including fetching user details, updating user balance, and resetting user balance. The application is designed for high performance and reliability, employing transactions and error handling to ensure data integrity.
 
 ## Features
