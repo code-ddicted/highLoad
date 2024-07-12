@@ -5,7 +5,7 @@ const URL = 'http://localhost:3000/users/1/balance'; // Adjust as necessary
 // Function to send request
 const sendRequest = async () => {
   try {
-    const response = await axios.put(URL, { amount: -2 });
+    const response = await axios.put(URL, { amount: -4 });
     return { status: 'success', data: response.data };
   } catch (error) {
     return { status: 'error', data: error.response ? error.response.data : 'Network error' };

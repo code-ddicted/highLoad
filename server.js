@@ -33,7 +33,7 @@ app.put('/users/:userId/balance',  async (req, res) => {
   try {
     // Use a transaction to ensure atomicity
     const result = await sequelize.transaction(async (t) => {
-      const user = await User.findByPk(userId, { lock: true, transaction: t });
+      const user = await User.findByPk(userId, { transaction: t });
 
       if (!user) {
         console.error(`User with ID ${userId} not found`);
@@ -49,7 +49,7 @@ app.put('/users/:userId/balance',  async (req, res) => {
       }
 
       // Update user's balance
-      await user.update({ balance: newBalance }, { transaction: t });
+      await user.update({ balance: newBalance },{where: {id:userId}}, { transaction: t });
 
       return user;
     });
