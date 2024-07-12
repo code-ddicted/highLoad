@@ -27,43 +27,38 @@ app.get('/users', async (req, res) => {
 
 //route to update the users balance
 app.put('/users/:id/balance', async (req, res) => {
-  const { id } = req.params;
-  const { amount } = req.body;
+  const transaction = await sequelize.transaction();
 
   try {
-    const result = await sequelize.transaction(async (t) => {
-      const user = await User.findByPk(id, { transaction: t });
+    const userId = req.params.id;
+    const amount = req.body.amount;
 
-      if (!user) {
-        throw new Error('User not found');
-      }
+    const user = await User.findByPk(userId, { transaction });
 
-      const newBalance = user.balance + amount;
-
-      if (newBalance < 0) {
-        throw new Error('Balance cannot go negative');
-        console.log('balance cannot go negative: '+ balCount++)
-      }
-
-      await user.update({ balance: newBalance }, { transaction: t });
-
-      return user;
-    });
-
-    res.status(200).json({ message: 'Balance updated successfully', balance: result.balance });
-  } catch (error) {
-
-    if (error.message === 'User not found') {
-      res.status(404).json({ error: 'User not found' });
-    } else if (error.message === 'Balance cannot go negative') {
-      res.status(400).json({ error: 'Balance cannot go negative' });
-    } else {
-      res.status(500).json({ error: 'Internal server error' });
+    if (!user) {
+      console.error(`User not found: ${userId}`);
+      await transaction.rollback();
+      return res.status(404).json({ error: 'User not found' });
     }
+
+    const newBalance = user.balance + amount;
+    if (newBalance < 0) {
+      await transaction.rollback();
+      return res.status(400).json({ error: 'Balance cannot go negative' });
+    }
+
+    await User.update({ balance: newBalance }, { where: { id: userId }, transaction });
+
+    await transaction.commit();
+    res.status(200).json({ message: 'Balance updated successfully' });
+  } catch (error) {
+    await transaction.rollback();
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 
+//await user.update({ balance: user.balance += amount }, { transaction: t });
 
 app.get('/reset', async (req, res) => {
   const userId = 1;
