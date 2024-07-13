@@ -1,5 +1,6 @@
 <p align="center">
-    <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" width="100" style="margin-right: 50px;">
+    <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" width="100" style="margin-right: 100px;">
+    <img src="https://www.svgrepo.com/download/354200/postgresql.svg" alt="Postgres" width="100" style="margin-right: 100px;">
     <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="100">
 </p>
 
