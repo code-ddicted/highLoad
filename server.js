@@ -10,7 +10,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-
 // Middleware
 app.use(express.json());
 
@@ -25,13 +24,13 @@ app.get('/users', async (req, res) => {
   }
 });
 
-//route to update the users balance
+// Route to update the user's balance
 app.put('/users/:id/balance', async (req, res) => {
   const transaction = await sequelize.transaction();
 
   try {
-    const userId = req.params.id;
-    const amount = req.body.amount;
+    const userId = parseInt(req.params.id, 10);
+    const amount = parseFloat(req.body.amount);
 
     const user = await User.findByPk(userId, { transaction });
 
@@ -42,12 +41,16 @@ app.put('/users/:id/balance', async (req, res) => {
     }
 
     const newBalance = user.balance + amount;
+
+    console.log("old balance: " + user.balance + " new balance: " + newBalance);
+
     if (newBalance < 0) {
       await transaction.rollback();
       return res.status(400).json({ error: 'Balance cannot go negative' });
     }
 
-    await User.update({ balance: newBalance }, { where: { id: userId }, transaction });
+    // Update the balance with locking
+    await User.update({ balance: newBalance }, { where: { id: userId }, transaction, lock: transaction.LOCK.UPDATE });
 
     await transaction.commit();
     res.status(200).json({ message: 'Balance updated successfully' });
@@ -57,14 +60,10 @@ app.put('/users/:id/balance', async (req, res) => {
   }
 });
 
-
-//await user.update({ balance: user.balance += amount }, { transaction: t });
-
 app.get('/reset', async (req, res) => {
   const userId = 1;
 
   try {
-    // Find user by ID
     const user = await User.findByPk(userId);
 
     if (!user) {
@@ -72,7 +71,6 @@ app.get('/reset', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Update user's balance to 10000
     await user.update({ balance: 10000 });
 
     return res.status(200).json({ message: 'User balance reset to 10000 successfully', balance: 10000 });
@@ -81,7 +79,6 @@ app.get('/reset', async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 // Start server
 const PORT = process.env.PORT || 3000;

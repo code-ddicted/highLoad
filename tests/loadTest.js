@@ -22,7 +22,12 @@ const runLoadTest = async () => {
   // Analyze results
   const successResponses = results.filter(result => result.status === 'success' && result.data.message === 'Balance updated successfully');
   const errorResponses = results.filter(result => result.status === 'error' && result.data.error === 'Balance cannot go negative');
-  const otherErrors = results.filter(result => result.status === 'error' && result.data.error !== 'Not enough funds in the balance');
+  const otherErrors = results.filter(result => 
+    result.status === 'error' && 
+    result.data.error !== 'Not enough funds in the balance' && 
+    result.data.error !== 'Balance cannot go negative'
+  );
+
 
   //console.log(JSON.stringify(successResponses))
 
