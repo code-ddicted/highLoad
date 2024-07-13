@@ -1,11 +1,10 @@
 <p align="center">
-  <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="100">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" width="100" style="margin-right: 50px;">
-  <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" width="100" style="margin-right: 50px;">
+    <img src="https://sequelize.org/img/logo.svg" alt="Sequelize" width="100" style="margin-right: 50px;">
+    <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="100">
 </p>
 
 # Overview
-This project is a Node.js application that connects to a PostgreSQL database using Sequelize ORM. It provides APIs for user management, including fetching user details, updating user balance, and resetting user balance. The application is designed for high performance and reliability, employing transactions and error handling to ensure data integrity.
+This project is a Node.js application that connects to a PostgreSQL database using Sequelize ORM. It provides APIs for user management, including fetching user details, updating user balance, and resetting user balance. The application is designed for high performance and reliability, employing transactions and error handling to ensure data integrity. Additionally, the application uses Sequelize to perform database migrations and manage concurrency in database operations, ensuring consistent and efficient data access in a concurrent environment.
 
 ## Features
 - Fetch all users
