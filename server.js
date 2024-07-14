@@ -4,6 +4,7 @@ const app = express();
 const sequelize = require('./config/database');
 const User = require('./models/user');
 
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
@@ -42,24 +43,24 @@ app.put('/users/:id/balance', async (req, res) => {
 
     const newBalance = user.balance + amount;
 
-    console.log("old balance: " + user.balance + " new balance: " + newBalance);
-
     if (newBalance < 0) {
-      await transaction.rollback();
       return res.status(400).json({ error: 'Balance cannot go negative' });
     }
 
     // Update the balance with locking
-    await User.update({ balance: newBalance }, { where: { id: userId }, transaction, lock: transaction.LOCK.UPDATE });
+    await User.update({ balance: newBalance }, { where: { id: userId }, transaction });
 
     await transaction.commit();
+    console.log(`Balance updated successfully for user ${userId}`);
     res.status(200).json({ message: 'Balance updated successfully' });
   } catch (error) {
     await transaction.rollback();
+    console.error('Error updating balance:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
+// Route to reset user balance (for testing purposes)
 app.get('/reset', async (req, res) => {
   const userId = 1;
 
@@ -71,7 +72,7 @@ app.get('/reset', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    await user.update({ balance: 10000 });
+    await user.update({ balance: 100 });
 
     return res.status(200).json({ message: 'User balance reset to 10000 successfully', balance: 10000 });
   } catch (error) {
