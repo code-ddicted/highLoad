@@ -6,12 +6,12 @@ const sequelize = require('./config/database');
 const User = require('./models/user');
 app.use(bodyParser.json());
 
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);
   res.status(500).json({ error: 'Internal server error' });
 });
-
 
 // Middleware
 app.use(express.json());
@@ -27,55 +27,55 @@ app.get('/users', async (req, res) => {
   }
 });
 
-app.put('/users/:userId/balance', async (req, res) => {
-  const userId = parseInt(req.params.userId, 10);
-  const { amount } = req.body;
-  const parsedAmount = parseInt(amount, 10);
 
-  // Validate parsed inputs
-  if (isNaN(userId) || isNaN(parsedAmount)) {
-    return res.status(400).json({ error: 'Invalid input: userId and amount must be integers' });
-  }
+// Route to update the user's balance
+app.put('/users/:id/balance', async (req, res) => {
+  const transaction = await sequelize.transaction();
 
   try {
-    // Find the user outside of the transaction to avoid row-level locks
-    const user = await User.findByPk(userId);
+    const userId = parseInt(req.params.id, 10);
+    const amount = parseFloat(req.body.amount);
+
+    const user = await User.findByPk(userId, { transaction });
 
     if (!user) {
-      console.error(`User with ID ${userId} not found`);
+      console.error(`User not found: ${userId}`);
+      await transaction.rollback();
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Calculate new balance
-    const newBalance = user.balance + parsedAmount;
+    const newBalance = user.balance + amount;
 
-    // Check if new balance would go negative
     if (newBalance < 0) {
       return res.status(400).json({ error: 'Balance cannot go negative' });
     }
 
-    // Use a transaction to ensure atomicity for the update operation
-    const result = await sequelize.transaction(async (t) => {
-      user.balance = newBalance;
-      await user.save({ transaction: t });
+    // Update the balance with locking
+    await user.update(
+      { balance: newBalance },
+      {
+        where: { id: userId },
+        transaction,
+        lock: transaction.LOCK.UPDATE
+      }
+    );
+    await transaction.commit();
 
-      return user;
-    });
-
-    return res.status(200).json({ message: 'Balance updated successfully', balance: result.balance });
+    console.log(`Balance updated successfully for user ${userId}`);
+    res.status(200).json({ message: 'Balance updated successfully' });
   } catch (error) {
-    console.error('Error updating balance:', error.message);
-    return res.status(500).json({ error: 'Internal server error' });
+    await transaction.rollback();
+    console.error('Error updating balance:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 
-
+// Route to reset user balance (for testing purposes)
 app.get('/reset', async (req, res) => {
   const userId = 1;
 
   try {
-    // Find user by ID
     const user = await User.findByPk(userId);
 
     if (!user) {
@@ -83,7 +83,6 @@ app.get('/reset', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Update user's balance to 10000
     await user.update({ balance: 10000 });
 
     return res.status(200).json({ message: 'User balance reset to 10000 successfully', balance: 10000 });
@@ -92,7 +91,6 @@ app.get('/reset', async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 // Start server
 const PORT = process.env.PORT || 3000;
